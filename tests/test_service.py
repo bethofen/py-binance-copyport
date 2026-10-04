@@ -80,7 +80,9 @@ def test_save_load_roundtrip(svc, tmp_path, fmt):
     assert meta["format"] == fmt and meta["counts"]["leads"] == 2 and meta["stage"] == "collect"
 
     back = svc.load("2026-09-05")
-    assert back.date == "2026-09-05" and len(back) == 2 and back.df["portfolioId"].dtype == object
+    # ids must come back as text (object on pandas 2, the str dtype on pandas 3), never as numbers
+    assert back.date == "2026-09-05" and len(back) == 2 and pd.api.types.is_string_dtype(back.df["portfolioId"])
+    assert all(isinstance(v, str) for v in back.df["portfolioId"])
     assert back.df.iloc[0]["snapshotDate"] == "2026-09-05" and back.df.iloc[0]["roi30d"] == ls.df.iloc[0]["roi30d"]
     raw = back.raw(PID)
     assert len(raw["chart"]["data"]) == 10 and raw["chart"]["data"][0]["value"] == 0

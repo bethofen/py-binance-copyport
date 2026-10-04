@@ -4,13 +4,20 @@ jobs:
   unit:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         python: ["3.10", "3.11", "3.12"]
+        # pandas 3 changed text columns from object to a str dtype; test both lines
+        pandas: ["pandas>=2,<3", "pandas>=3"]
+        exclude:
+          - python: "3.10"          # pandas 3 needs Python >= 3.11
+            pandas: "pandas>=3"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
-      - run: pip install -e ".[dev]"
+      - run: pip install -e ".[dev]" "${{ matrix.pandas }}"
+      - run: python -c "import pandas; print('pandas', pandas.__version__)"
       # offline only: live tests (RUN_LIVE=1) cannot run here, binance.com blocks US runners
       - run: python -m pytest
