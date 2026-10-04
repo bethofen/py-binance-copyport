@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "binance-copytrade-data"
+version = "0.2.0"
+description = "Fetch, normalise and store Binance Futures copy-trading lead data (unofficial public web endpoints, local files)"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = ["requests>=2.31", "pandas>=2.0"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0", "numpy"]
+
+[project.scripts]
+binance-copytrade = "binance_copytrade.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+binance_copytrade = ["py.typed"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+filterwarnings = ["ignore::DeprecationWarning"]
